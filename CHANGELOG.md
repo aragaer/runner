@@ -23,4 +23,5 @@
 - Channel class
 - Handle stdio and socket channels
 
-[Unreleased]: https://github.com/aragaer/runner/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/aragaer/runner/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/aragaer/runner/compare/v0.1.0...v0.1.1
