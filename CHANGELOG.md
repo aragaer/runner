@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+- Travis CI badge in README
 
 ## 0.1.0 - 2018-01-28
 ### Added
