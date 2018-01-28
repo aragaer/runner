@@ -6,6 +6,9 @@
 - Codecov badge in README
 - Ignore "tests" in coverage report
 
+### Fixed
+- 'Unreleased' link in this changelog
+
 ## 0.1.0 - 2018-01-28
 ### Added
 - License
@@ -15,4 +18,4 @@
 - Channel class
 - Handle stdio and socket channels
 
-[Unreleased]: https://github.com/aragaer/scheduler/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/aragaer/runner/compare/v0.1.0...HEAD
