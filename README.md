@@ -1,4 +1,4 @@
-# Runner [![Build Status](https://travis-ci.org/aragaer/runner.svg?branch=master)](https://travis-ci.org/aragaer/runner)
+# Runner [![Build Status](https://travis-ci.org/aragaer/runner.svg?branch=master)](https://travis-ci.org/aragaer/runner)[![codecov](https://codecov.io/gh/aragaer/runner/branch/master/graph/badge.svg)](https://codecov.io/gh/aragaer/runner)
 
 Simple wrapper around subprocess.Popen.
 
