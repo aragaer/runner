@@ -18,7 +18,7 @@ class RunnerTest(unittest.TestCase):
 
     @staticmethod
     def _readline(channel):
-        for _ in range(10):
+        for _ in range(100):
             time.sleep(0.001)
             line = channel.read()
             if line is not None:
