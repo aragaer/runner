@@ -4,6 +4,7 @@
 ### Added
 - Travis CI badge in README
 - Codecov badge in README
+- Ignore "tests" in coverage report
 
 ## 0.1.0 - 2018-01-28
 ### Added
