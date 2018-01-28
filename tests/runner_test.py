@@ -147,3 +147,20 @@ class RunnerTest(unittest.TestCase):
         channel = self._runner.get_channel('socat')
         channel.write(b'hello, world')
         self.assertEquals(self._readline(channel), b'hello, world')
+
+    def test_wait_socket(self):
+        dirname = mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(dirname))
+        sockname = os.path.join(dirname, "socket")
+
+        cmd = 'sh -c "sleep 0.1; socat SYSTEM:cat UNIX-LISTEN:{}"'.format(sockname)
+        self._runner.update_config({"socat":
+                                    {"command": cmd,
+                                     "type": "socket",
+                                     "cwd": dirname}})
+
+        self._runner.ensure_running('socat', socket=sockname)
+
+        channel = self._runner.get_channel('socat')
+        channel.write(b'hello, world')
+        self.assertEquals(self._readline(channel), b'hello, world')

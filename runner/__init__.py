@@ -56,8 +56,8 @@ class App:
             _LOGGER.debug("Waiting for socket %s", sockname)
             while not os.path.exists(sockname):
                 time.sleep(0.1)
-                sock.connect(sockname)
-                chan = channel.SocketChannel(sock)
+            sock.connect(sockname)
+            chan = channel.SocketChannel(sock)
         return Proc(proc, chan)
 
 
