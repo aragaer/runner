@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.1.1] - 2018-01-28
 ### Added
 - Travis CI badge in README
 - Codecov badge in README
