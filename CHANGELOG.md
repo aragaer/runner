@@ -5,6 +5,7 @@
 - Travis CI badge in README
 - Codecov badge in README
 - Ignore "tests" in coverage report
+- setup.py
 
 ### Fixed
 - 'Unreleased' link in this changelog
