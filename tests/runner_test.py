@@ -101,14 +101,17 @@ class RunnerTest(unittest.TestCase):
     def test_terminate(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
         self._runner.ensure_running('cat')
+        chan = self._runner.get_channel('cat')
 
         self._runner.terminate('cat')
 
-        with self.assertRaises(EndpointClosedException):
-            self._runner.get_channel('cat').read()
+        self.assertIsNone(self._runner.get_channel('cat'))
 
         with self.assertRaises(EndpointClosedException):
-            self._runner.get_channel('cat').write(b' ')
+            chan.read()
+
+        with self.assertRaises(EndpointClosedException):
+            chan.write(b' ')
 
     def test_terminate_socket(self):
         dirname = mkdtemp()
@@ -121,14 +124,17 @@ class RunnerTest(unittest.TestCase):
                                      "socket": sockname}})
 
         self._runner.ensure_running('socat')
+        chan = self._runner.get_channel('socat')
 
         self._runner.terminate('socat')
 
-        with self.assertRaises(EndpointClosedException):
-            self._runner.get_channel('socat').read()
+        self.assertIsNone(self._runner.get_channel('socat'))
 
         with self.assertRaises(EndpointClosedException):
-            self._runner.get_channel('socat').write(b' ')
+            chan.read()
+
+        with self.assertRaises(EndpointClosedException):
+            chan.write(b' ')
 
     def test_socket_arg(self):
         dirname = mkdtemp()
@@ -164,3 +170,15 @@ class RunnerTest(unittest.TestCase):
         channel = self._runner.get_channel('socat')
         channel.write(b'hello, world')
         self.assertEquals(self._readline(channel), b'hello, world')
+
+    def test_terminate_restart(self):
+        self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
+        self._runner.ensure_running('cat')
+
+        self._runner.terminate('cat')
+
+        self._runner.ensure_running('cat')
+
+        chan = self._runner.get_channel('cat')
+        chan.write(b'hello')
+        self.assertEqual(self._readline(chan), b'hello')

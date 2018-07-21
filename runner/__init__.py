@@ -80,8 +80,10 @@ class Runner:
         _LOGGER.debug("%s started", alias)
 
     def get_channel(self, alias):
-        return self._procs[alias].channel
+        if alias in self._procs:
+            return self._procs[alias].channel
 
     def terminate(self, alias):
         proc = self._procs[alias]
         proc.terminate()
+        del self._procs[alias]

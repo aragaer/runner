@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+### Fixed
+- Cleanup terminated processes
+- get_channel for terminated process now returns None
 
 ## [0.1.1] - 2018-01-28
 ### Added
