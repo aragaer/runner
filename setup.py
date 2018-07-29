@@ -2,12 +2,17 @@
 
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="yet-another-runner",
-    version="0.1.1",
+    version="0.1.1.1",
     author="Ilya Konovalov",
     author_email="aragaer@gmail.com",
     description="Simple process runner",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     license="MIT",
     keywords="run command shell socket",
     url="https://github.com/aragaer/runner",
