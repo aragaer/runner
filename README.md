@@ -51,6 +51,9 @@ Starts the process unless it is already started.
 - `with_args`: list of additional arguments that will be added to the command
 - `socket` can be specified for socket-type processes to set or override the name of UNIX socket file
 
+`start(self, app_name, alias=None, with_args=None, **kwargs)`
+Starts the process. Raises `ProcessExistsException` if it is already started.
+
 `get_channel(self, alias)`
 Returns the `Channel` object to communicate to the running process.
 

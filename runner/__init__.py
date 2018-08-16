@@ -10,6 +10,10 @@ import runner.channel as channel
 _LOGGER = logging.getLogger(__name__)
 
 
+class ProcessExistsException(Exception):
+    pass
+
+
 class Proc:
 
     def __init__(self, proc, chan):
@@ -78,6 +82,13 @@ class Runner:
         _LOGGER.info("Starting application %s as %s", app_name, alias)
         self._procs[alias] = self._apps[app_name].start(with_args, **kwargs)
         _LOGGER.debug("%s started", alias)
+
+    def start(self, app_name, alias=None, with_args=None, **kwargs):
+        if alias is None:
+            alias = app_name
+        if alias in self._procs:
+            raise ProcessExistsException
+        self.ensure_running(app_name, alias, with_args, **kwargs)
 
     def get_channel(self, alias):
         if alias in self._procs:

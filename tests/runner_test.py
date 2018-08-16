@@ -6,7 +6,7 @@ import unittest
 from tempfile import mkdtemp
 
 from runner.channel import EndpointClosedException, Channel
-from runner import Runner
+from runner import Runner, ProcessExistsException
 
 
 class RunnerTest(unittest.TestCase):
@@ -182,3 +182,12 @@ class RunnerTest(unittest.TestCase):
         chan = self._runner.get_channel('cat')
         chan.write(b'hello')
         self.assertEqual(self._readline(chan), b'hello')
+
+    def test_start(self):
+        self._runner.update_config({"sleep": {"command": "sleep 5", "type": "stdio"}})
+        self.addCleanup(lambda: self._runner.terminate('sleep'))
+
+        self._runner.start('sleep')
+
+        with self.assertRaises(ProcessExistsException):
+            self._runner.start('sleep')
