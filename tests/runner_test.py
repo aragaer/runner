@@ -191,3 +191,12 @@ class RunnerTest(unittest.TestCase):
 
         with self.assertRaises(ProcessExistsException):
             self._runner.start('sleep')
+
+    def test_ensure_running_twice(self):
+        self._runner.update_config({"echo": {"command": "echo", "type": "stdio"}})
+
+        self._runner.ensure_running("echo", with_args=["hello, world"])
+        self._runner.ensure_running("echo", with_args=["goodbye, world"])
+
+        chan = self._runner.get_channel('echo')
+        self.assertEqual(self._readline(chan), b'hello, world\n')

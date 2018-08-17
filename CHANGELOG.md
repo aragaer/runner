@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Cleanup terminated processes
+- Do not start process with ensure_running if it is already running
 
 ### Changed
 - get_channel for terminated process now returns None
