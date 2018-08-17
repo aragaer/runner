@@ -80,7 +80,7 @@ class Runner:
         if alias is None:
             alias = app_name
         if alias in self._procs:
-            _LOGGER.info("Application alias %s is already taken, not starting", alias, app_name)
+            _LOGGER.info("Application alias %s is already taken, not starting %s", alias, app_name)
             return
         _LOGGER.info("Starting application %s as %s", app_name, alias)
         self._procs[alias] = self._apps[app_name].start(with_args, **kwargs)
