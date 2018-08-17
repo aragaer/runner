@@ -36,6 +36,7 @@ Using UNIX socket.
 ### Runner
 
 `update_config(self, config)`
+
 Config must be a dictionary where each key is an alias of an application and value is a dictionary of that application's configuration. The following fields are expected:
 
 - `command` (required): The command to be executed
@@ -44,29 +45,34 @@ Config must be a dictionary where each key is an alias of an application and val
 - `socket`: if type is `socket`, this is the name of the UNIX socket file to connect to
 
 `ensure_running(self, app_name, alias=None, with_args=None, **kwargs)`
-Starts the process unless it is already started.
+
+`start(self, app_name, alias=None, with_args=None, **kwargs)`
+
+Start the process. If the process with the same alias is already running, `start` will raise `ProcessExistsException`, while `ensure_running` will silently do nothing.
 
 - `app_name`: application alias, given in the configuration
 - `alias`: alias that will be given to actual started process. If `None`, application alias will be used
 - `with_args`: list of additional arguments that will be added to the command
 - `socket` can be specified for socket-type processes to set or override the name of UNIX socket file
 
-`start(self, app_name, alias=None, with_args=None, **kwargs)`
-Starts the process. Raises `ProcessExistsException` if it is already started.
-
 `get_channel(self, alias)`
+
 Returns the `Channel` object to communicate to the running process.
 
 `terminate(self, alias)`
+
 Terminates the process.
 
 ### Channel
 
 `read(self)`
+
 Performs a non-blocking read and returns any bytes available. Raises `EndpointClosedException` if the process on the other side of the channel is terminated.
 
 `write(self, *data)`
+
 Writes chunks of bytes to the channel. Raises `EndpointClosedException`.
 
 `close(self)`
+
 Closes the channel and frees up the resources.
