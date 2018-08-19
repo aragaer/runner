@@ -37,6 +37,15 @@ class App:
         self._type = type
         self._kwargs = kwargs
 
+    @staticmethod
+    def _connect_socket(sockname):
+        sock = socket.socket(socket.AF_UNIX)
+        _LOGGER.debug("Waiting for socket %s", sockname)
+        while not os.path.exists(sockname):
+            time.sleep(0.1)
+        sock.connect(sockname)
+        return channel.SocketChannel(sock)
+
     def start(self, extra_args, **extra_kwargs):
         kwargs = {**extra_kwargs, **self._kwargs}
         if self._type == 'stdio':
@@ -61,12 +70,7 @@ class App:
             chan = channel.PipeChannel(sink=proc.stdin.fileno(),
                                        faucet=proc.stdout.fileno())
         elif self._type == 'socket':
-            sock = socket.socket(socket.AF_UNIX)
-            _LOGGER.debug("Waiting for socket %s", sockname)
-            while not os.path.exists(sockname):
-                time.sleep(0.1)
-            sock.connect(sockname)
-            chan = channel.SocketChannel(sock)
+            chan = self._connect_socket(sockname)
         if kwargs.get("buffering") == "line":
             chan = channel.LineChannel(chan)
         return Proc(proc, chan)
