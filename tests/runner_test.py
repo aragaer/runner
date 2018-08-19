@@ -206,11 +206,8 @@ class RunnerTest(unittest.TestCase):
         self._runner.update_config({"sleep_echo": {"command": 'sh -c "read; echo test"'}})
 
         self._runner.start("sleep_echo")
-        try:
+        with self.assertRaises(KeyboardInterrupt):
             os.killpg(os.getpgrp(), signal.SIGINT)
-            self.fail("No kill?")
-        except KeyboardInterrupt:
-            pass
 
         time.sleep(0.1)
 
@@ -222,11 +219,8 @@ class RunnerTest(unittest.TestCase):
                                                    "setpgrp": True}})
 
         self._runner.start("sleep_echo")
-        try:
+        with self.assertRaises(KeyboardInterrupt):
             os.killpg(os.getpgrp(), signal.SIGINT)
-            self.fail("No kill?")
-        except KeyboardInterrupt:
-            pass
 
         if os.environ.get('TRAVIS', False):
             raise unittest.SkipTest("setpgrp doesn't work on travis")
