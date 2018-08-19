@@ -88,3 +88,33 @@ class SocketChannel(Channel):
 
     def close(self):
         self._sock.close()
+
+
+class LineChannel(Channel):
+
+    def __init__(self, inner):
+        self._inner = inner
+        self._buffer = b''
+
+    def read(self):
+        if b'\n' not in self._buffer:
+            try:
+                self._buffer += self._inner.read()
+            except EndpointClosedException:
+                if not self._buffer:
+                    raise
+        if b'\n' in self._buffer:
+            result, self._buffer = self._buffer.split(b'\n', 1)
+            return result+b'\n'
+        try:
+            self._buffer += self._inner.read()
+        except EndpointClosedException:
+            result, self._buffer = self._buffer, b''
+            return result
+        return b''
+
+    def write(self, *data):
+        return self._inner.write(*data)
+
+    def close(self):
+        return self._inner.close()

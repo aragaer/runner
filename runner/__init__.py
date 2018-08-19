@@ -67,6 +67,8 @@ class App:
                 time.sleep(0.1)
             sock.connect(sockname)
             chan = channel.SocketChannel(sock)
+        if kwargs.get("buffering") == "line":
+            chan = channel.LineChannel(chan)
         return Proc(proc, chan)
 
 

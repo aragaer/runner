@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - BetterCodeHub badge
 - PayPal donate button
 - setpgrp flag
+- line-buffering mode
 
 ### Fixed
 - Reading from closed channel now fails only when all data has been retrieved
