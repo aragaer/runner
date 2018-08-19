@@ -95,19 +95,35 @@ class LineChannel(Channel):
     def __init__(self, inner):
         self._inner = inner
         self._buffer = b''
+        self._lf = 0
+
+    def _read(self):
+        new_bytes = self._inner.read()
+        self._lf = new_bytes.find(b'\n')+1
+        if self._lf:
+            self._lf += len(self._buffer)
+        self._buffer += new_bytes
+
+    def _get_first_line(self):
+        result, self._buffer = self._buffer[:self._lf], self._buffer[self._lf:]
+        self._lf = self._buffer.find(b'\n')+1
+        return result
 
     def read(self):
-        if b'\n' not in self._buffer:
-            try:
-                self._buffer += self._inner.read()
-            except EndpointClosedException:
-                if not self._buffer:
-                    raise
-        if b'\n' in self._buffer:
-            result, self._buffer = self._buffer.split(b'\n', 1)
-            return result+b'\n'
+        if self._lf:
+            return self._get_first_line()
+
         try:
-            self._buffer += self._inner.read()
+            self._read()
+        except EndpointClosedException:
+            if not self._buffer:
+                raise
+
+        if self._lf:
+            return self._get_first_line()
+
+        try:
+            self._read()
         except EndpointClosedException:
             result, self._buffer = self._buffer, b''
             return result
