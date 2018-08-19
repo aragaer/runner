@@ -38,7 +38,12 @@ class PipeChannel(Channel):
 
     def read(self):
         try:
-            return self._in.read() or b''
+            result = self._in.read()
+            if result is None:
+                return b''
+            if not result:
+                raise EndpointClosedException()
+            return result
         except (ValueError, OSError) as ex:
             raise EndpointClosedException(ex)
 
@@ -65,7 +70,10 @@ class SocketChannel(Channel):
 
     def read(self):
         try:
-            return self._sock.recv(4096)
+            result = self._sock.recv(4096)
+            if not result:
+                raise EndpointClosedException()
+            return result
         except BlockingIOError:
             return b''
         except OSError as ex:

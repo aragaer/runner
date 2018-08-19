@@ -104,3 +104,15 @@ class PipeChannelTest(unittest.TestCase):
         with self.assertRaises(OSError) as ose:
             os.write(that_sink_fd, b' ')
             self.assertEqual(ose.exception.error_code, 9)  # EBADF
+
+    def test_write_close_read(self):
+        that_faucet_fd, this_sink_fd = os.pipe()
+        channel = PipeChannel(faucet=that_faucet_fd)
+
+        sink_file = os.fdopen(this_sink_fd, mode='wb')
+        sink_file.write(b'hello, world')
+        sink_file.close()
+
+        self.assertEqual(channel.read(), b'hello, world')
+        with self.assertRaises(EndpointClosedException):
+            channel.read()

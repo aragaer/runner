@@ -58,3 +58,11 @@ class SocketChannelTest(unittest.TestCase):
         with self.assertRaises(OSError) as ose:
             self._client.send(b' ')
             self.assertEqual(ose.exception.error_code, 9)  # EBADF
+
+    def test_write_close_read(self):
+        self._server.send(b'hello, world')
+        self._server.close()
+
+        self.assertEqual(self._channel.read(), b'hello, world')
+        with self.assertRaises(EndpointClosedException):
+            self._channel.read()
