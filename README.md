@@ -43,6 +43,7 @@ Config must be a dictionary where each key is an alias of an application and val
 - `type`: Either `stdio` or `socket`. Default is `stdio`
 - `cwd`: Working directory of the process
 - `socket`: if type is `socket`, this is the name of the UNIX socket file to connect to
+- `setpgrp`: if `True` the process is moved to a separate process group and will not receive signals sent to main process. Default is `False`
 
 `ensure_running(self, app_name, alias=None, with_args=None, **kwargs)`
 
@@ -53,7 +54,7 @@ Start the process. If the process with the same alias is already running, `start
 - `app_name`: application alias, given in the configuration
 - `alias`: alias that will be given to actual started process. If `None`, application alias will be used
 - `with_args`: list of additional arguments that will be added to the command
-- `socket` can be specified for socket-type processes to set or override the name of UNIX socket file
+- `kwargs`: extend or override parameters in application config
 
 `get_channel(self, alias)`
 

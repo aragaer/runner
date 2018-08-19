@@ -1,5 +1,6 @@
 import os
 import shutil
+import signal
 import time
 import unittest
 
@@ -200,3 +201,31 @@ class RunnerTest(unittest.TestCase):
 
         chan = self._runner.get_channel('echo')
         self.assertEqual(self._readline(chan), b'hello, world\n')
+
+    def test_setpgrp_false(self):
+        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read; echo test"'}})
+
+        self._runner.start("sleep_echo")
+        try:
+            os.killpg(os.getpgrp(), signal.SIGINT)
+            self.fail("No kill?")
+        except KeyboardInterrupt:
+            pass
+
+        with self.assertRaises(EndpointClosedException):
+            self._runner.get_channel('sleep_echo').write(b'\n')
+
+    def test_setpgrp_true(self):
+        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read; echo test"',
+                                                   "setpgrp": True}})
+
+        self._runner.start("sleep_echo")
+        try:
+            os.killpg(os.getpgrp(), signal.SIGINT)
+            self.fail("No kill?")
+        except KeyboardInterrupt:
+            pass
+
+        chan = self._runner.get_channel('sleep_echo')
+        chan.write(b'\n')
+        self.assertEqual(self._readline(chan), b'test\n', "Child process is not killed")

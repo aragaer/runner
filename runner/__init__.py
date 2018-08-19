@@ -38,19 +38,24 @@ class App:
         self._kwargs = kwargs
 
     def start(self, extra_args, **extra_kwargs):
+        kwargs = {**extra_kwargs, **self._kwargs}
         if self._type == 'stdio':
             stdin = stdout = subprocess.PIPE
         elif self._type == 'socket':
-            sockname = extra_kwargs.get('socket') or self._kwargs['socket']
+            sockname = kwargs['socket']
             stdin = stdout = None
             if os.path.exists(sockname):
                 os.unlink(sockname)
         command = self._command[:]
         if extra_args is not None:
             command += extra_args
+        preexec_fn = None
+        if kwargs.get('setpgrp', False):
+            preexec_fn = os.setpgrp
         proc = subprocess.Popen(command,
                                 stdin=stdin,
                                 stdout=stdout,
+                                preexec_fn=preexec_fn,
                                 cwd=self._kwargs.get('cwd'))
         if self._type == 'stdio':
             chan = channel.PipeChannel(sink=proc.stdin.fileno(),
