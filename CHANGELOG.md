@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ###
 - BetterCodeHub badge
+- PayPal donate button
 
 ## [0.2.0] - 2018-08-17
 ### Added

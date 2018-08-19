@@ -1,4 +1,4 @@
-# Runner [![Build Status](https://travis-ci.org/aragaer/runner.svg?branch=master)](https://travis-ci.org/aragaer/runner) [![codecov](https://codecov.io/gh/aragaer/runner/branch/master/graph/badge.svg)](https://codecov.io/gh/aragaer/runner)[![BCH compliance](https://bettercodehub.com/edge/badge/aragaer/runner?branch=master)](https://bettercodehub.com/)
+# Runner [![Build Status](https://travis-ci.org/aragaer/runner.svg?branch=master)](https://travis-ci.org/aragaer/runner) [![codecov](https://codecov.io/gh/aragaer/runner/branch/master/graph/badge.svg)](https://codecov.io/gh/aragaer/runner) [![BCH compliance](https://bettercodehub.com/edge/badge/aragaer/runner?branch=master)](https://bettercodehub.com/) [![donate using paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=aragaer@gmail.com&lc=RU&item_name=RUNNER&currency_code=USD&bn=PP-DonationsBF:btn_donate_SM.gif:NonHosted)
 
 Simple wrapper around subprocess.Popen.
 
