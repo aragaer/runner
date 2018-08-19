@@ -35,16 +35,24 @@ Using UNIX socket.
 
 ### Runner
 
-`update_config(self, config)`
+`add(self, name, command, **kwargs)`
 
-Config must be a dictionary where each key is an alias of an application and value is a dictionary of that application's configuration. The following fields are expected:
+Add the application to the list of registered applications or update if already added.
 
-- `command` (required): The command to be executed
-- `type`: Either `stdio` or `socket`. Default is `stdio`
-- `cwd`: Working directory of the process
+- `name`: application name
+- `command`: the command to be executed
+
+`**kwargs` can include the following:
+
+- `type`: either `stdio` or `socket`. Default is `stdio`
+- `cwd`: working directory of the process
 - `socket`: if type is `socket`, this is the name of the UNIX socket file to connect to
 - `setpgrp`: if `True` the process is moved to a separate process group and will not receive signals sent to main process. Default is `False`
 - `buffering`: if set to `"line"` the channel is line-buffered for reading
+
+`update_config(self, config)`
+
+Config must be a dictionary where each key is an alias of an application and value is a dictionary of that application's configuration. `runner.add("app", "command", **kwargs)` is equivalent to `runner.update_config({"app": {"command": "command", **kwargs}})`. Useful for adding multiple applications at once.
 
 `ensure_running(self, app_name, alias=None, with_args=None, **kwargs)`
 

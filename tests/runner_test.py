@@ -228,3 +228,12 @@ class RunnerTest(unittest.TestCase):
         chan = self._runner.get_channel('sleep_echo')
         chan.write(b'\n')
         self.assertEqual(self._readline(chan), b'test\n', "Child process is not killed")
+
+    def test_register_cat(self):
+        self._runner.add("cat", command="cat")
+        self._runner.start('cat')
+
+        channel = self._runner.get_channel('cat')
+        channel.write(b'hello, world')
+
+        self.assertEquals(self._readline(channel), b'hello, world')

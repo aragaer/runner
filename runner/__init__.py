@@ -82,6 +82,9 @@ class Runner:
         self._apps = {}
         self._procs = {}
 
+    def add(self, app, command, **kwargs):
+        self.update_config({app: {"command": command, **kwargs}})
+
     def update_config(self, config):
         for app, app_config in config.items():
             _LOGGER.debug("Updating config for %s", app)
