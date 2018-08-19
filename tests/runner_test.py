@@ -212,6 +212,8 @@ class RunnerTest(unittest.TestCase):
         except KeyboardInterrupt:
             pass
 
+        time.sleep(0.1)
+
         with self.assertRaises(EndpointClosedException):
             self._runner.get_channel('sleep_echo').write(b'\n')
 
@@ -225,6 +227,9 @@ class RunnerTest(unittest.TestCase):
             self.fail("No kill?")
         except KeyboardInterrupt:
             pass
+
+        if os.environ.get('TRAVIS', False):
+            raise unittest.SkipTest("setpgrp doesn't work on travis")
 
         chan = self._runner.get_channel('sleep_echo')
         chan.write(b'\n')
