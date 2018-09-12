@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Channels documentation
 - TestChannel
 
+### Fixed
+- Arguments passed in run()/ensure_running() override arguments in config
+
 ## [0.3.0] - 2018-08-19
 ### Added
 - BetterCodeHub badge

@@ -237,3 +237,14 @@ class RunnerTest(unittest.TestCase):
         channel.write(b'hello, world')
 
         self.assertEquals(self._readline(channel), b'hello, world')
+
+    def test_extra_kwargs_override_kwargs(self):
+        self._runner.update_config({"cat": {"command": "cat", "type": "stdio", "buffering": "line"}})
+        self._runner.ensure_running('cat', buffering=None)
+
+        channel = self._runner.get_channel('cat')
+
+        self.assertTrue(isinstance(channel, Channel))
+        channel.write(b'hello, world')
+
+        self.assertEquals(self._readline(channel), b'hello, world')

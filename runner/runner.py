@@ -47,7 +47,7 @@ class _App:
         return channel.SocketChannel(sock)
 
     def start(self, extra_args, **extra_kwargs):
-        kwargs = {**extra_kwargs, **self._kwargs}
+        kwargs = dict(self._kwargs, **extra_kwargs)
         if self._type == 'stdio':
             stdin = stdout = subprocess.PIPE
         elif self._type == 'socket':
