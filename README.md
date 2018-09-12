@@ -106,11 +106,12 @@ Closes the channel and frees up the resources.
 `get_fd(self)`
 
 Returns a file descriptor number that can be used for `poll` or
-`epoll` for reading. Raises `NotImplementedError` if channel doesn't
-support reading.
+`epoll` for reading. Raises `NotImplementedError` if (custom) channel
+doesn't support reading.
 
 The following channel classes are implemented:
 
 - `PipeChannel` is returned when communicating with process over STDIO. Can be manually constructed to wrap reading and/or writing to any file descriptor.
 - `SocketChannel` is returned when communicating with process over socket. Can be manually constructed for any socket (not limited to UNIX sockets).
 - `LineChannel` is returned when line buffering is enabled. Can be manually constructed for any other channel class.
+- `TestChannel` (in package runner.testing) provides `put` and `get` methods to to feed data to `read` and fetch "written" data respectively.

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - get_fd() for channels
 - Channels documentation
+- TestChannel
 
 ## [0.3.0] - 2018-08-19
 ### Added
