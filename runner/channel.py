@@ -22,6 +22,9 @@ class Channel(metaclass=ABCMeta):
     def close(self): #pragma: no cover
         raise NotImplementedError
 
+    def get_fd(self): #pragma: no cover
+        raise NotImplementedError
+
 
 class PipeChannel(Channel):
 
@@ -61,6 +64,11 @@ class PipeChannel(Channel):
         if self._out is not None:
             self._out.close()
 
+    def get_fd(self):
+        if self._in is not None:
+            return self._in.fileno()
+        return super().get_fd()
+
 
 class SocketChannel(Channel):
 
@@ -88,6 +96,9 @@ class SocketChannel(Channel):
 
     def close(self):
         self._sock.close()
+
+    def get_fd(self):
+        return self._sock.fileno()
 
 
 class LineChannel(Channel):
@@ -134,3 +145,6 @@ class LineChannel(Channel):
 
     def close(self):
         return self._inner.close()
+
+    def get_fd(self):
+        return self._inner.get_fd()

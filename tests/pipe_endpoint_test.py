@@ -116,3 +116,16 @@ class PipeChannelTest(unittest.TestCase):
         self.assertEqual(channel.read(), b'hello, world')
         with self.assertRaises(EndpointClosedException):
             channel.read()
+
+    def test_get_fd_read(self):
+        that_faucet_fd, this_sink_fd = os.pipe()
+        channel = PipeChannel(faucet=that_faucet_fd)
+
+        self.assertEqual(channel.get_fd(), that_faucet_fd)
+
+    def test_get_fd_write_only(self):
+        that_faucet_fd, this_sink_fd = os.pipe()
+        channel = PipeChannel(sink=this_sink_fd)
+
+        with self.assertRaises(NotImplementedError):
+            channel.get_fd()

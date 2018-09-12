@@ -66,3 +66,6 @@ class SocketChannelTest(unittest.TestCase):
         self.assertEqual(self._channel.read(), b'hello, world')
         with self.assertRaises(EndpointClosedException):
             self._channel.read()
+
+    def test_get_fd(self):
+        self.assertEqual(self._channel.get_fd(), self._client.fileno())

@@ -1,7 +1,8 @@
+import os
 import time
 import unittest
 
-from runner.channel import Channel, EndpointClosedException, LineChannel
+from runner.channel import Channel, EndpointClosedException, LineChannel, PipeChannel
 from runner import Runner
 
 
@@ -128,3 +129,25 @@ class LineBufferingTest(unittest.TestCase):
         self.assertEqual(self._chan.read(), b'world')
         with self.assertRaises(EndpointClosedException):
             print(self._chan.read())
+
+    def test_get_fd_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            self._chan.get_fd()
+
+
+class LineChannelTest(unittest.TestCase):
+
+    def test_get_fd_readable(self):
+        faucet_fd, sink_fd = os.pipe()
+        inner = PipeChannel(faucet=faucet_fd)
+        channel = LineChannel(inner)
+
+        self.assertEqual(channel.get_fd(), faucet_fd)
+
+    def test_get_fd_write_only(self):
+        faucet_fd, sink_fd = os.pipe()
+        inner = PipeChannel(sink=sink_fd)
+        channel = LineChannel(inner)
+
+        with self.assertRaises(NotImplementedError):
+            channel.get_fd()

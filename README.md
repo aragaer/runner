@@ -2,9 +2,14 @@
 
 Simple wrapper around subprocess.Popen.
 
-Multiple commands can be configured to be executed. Each command can have some predetermined parameters and additional parameters or overrides can be passed when application is executed. Multiple instances of one application can be running using aliases.
+Multiple commands can be configured to be executed. Each command can
+have some predetermined parameters and additional parameters or
+overrides can be passed when application is executed. Multiple
+instances of one application can be running using aliases.
 
-To communicate to running processes Channel classes are used. These provide non-blocking byte- or line-oriented data. Currently STDIO and UNIX socket are supported.
+To communicate to running processes Channel classes are used. These
+provide non-blocking byte- or line-oriented data. Currently STDIO and
+UNIX socket are supported.
 
 Examples:
 
@@ -37,7 +42,8 @@ Using UNIX socket.
 
 `add(self, name, command, **kwargs)`
 
-Add the application to the list of registered applications or update if already added.
+Add the application to the list of registered applications or update
+if already added.
 
 - `name`: application name
 - `command`: the command to be executed
@@ -52,13 +58,19 @@ Add the application to the list of registered applications or update if already 
 
 `update_config(self, config)`
 
-Config must be a dictionary where each key is an alias of an application and value is a dictionary of that application's configuration. `runner.add("app", "command", **kwargs)` is equivalent to `runner.update_config({"app": {"command": "command", **kwargs}})`. Useful for adding multiple applications at once.
+Config must be a dictionary where each key is an alias of an
+application and value is a dictionary of that application's
+configuration. `runner.add("app", "command", **kwargs)` is equivalent
+to `runner.update_config({"app": {"command": "command",
+**kwargs}})`. Useful for adding multiple applications at once.
 
 `ensure_running(self, app_name, alias=None, with_args=None, **kwargs)`
 
 `start(self, app_name, alias=None, with_args=None, **kwargs)`
 
-Start the process. If the process with the same alias is already running, `start` will raise `ProcessExistsException`, while `ensure_running` will silently do nothing.
+Start the process. If the process with the same alias is already
+running, `start` will raise `ProcessExistsException`, while
+`ensure_running` will silently do nothing.
 
 - `app_name`: application alias, given in the configuration
 - `alias`: alias that will be given to actual started process. If `None`, application alias will be used
@@ -74,10 +86,14 @@ Returns the `Channel` object to communicate to the running process.
 Terminates the process.
 
 ### Channel
+Channel is the base class for different channels. Every channel
+implements the following methods:
 
 `read(self)`
 
-Performs a non-blocking read and returns any bytes available. Raises `EndpointClosedException` if the process on the other side of the channel is terminated.
+Performs a non-blocking read and returns any bytes available. Raises
+`EndpointClosedException` if the process on the other side of the
+channel is terminated.
 
 `write(self, *data)`
 
@@ -86,3 +102,15 @@ Writes chunks of bytes to the channel. Raises `EndpointClosedException`.
 `close(self)`
 
 Closes the channel and frees up the resources.
+
+`get_fd(self)`
+
+Returns a file descriptor number that can be used for `poll` or
+`epoll` for reading. Raises `NotImplementedError` if channel doesn't
+support reading.
+
+The following channel classes are implemented:
+
+- `PipeChannel` is returned when communicating with process over STDIO. Can be manually constructed to wrap reading and/or writing to any file descriptor.
+- `SocketChannel` is returned when communicating with process over socket. Can be manually constructed for any socket (not limited to UNIX sockets).
+- `LineChannel` is returned when line buffering is enabled. Can be manually constructed for any other channel class.
