@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Poller class
 - utils file with `timeout` context manager
 
+### Changed
+- Runner now sleeps for 0.01 seconds when waiting for socket file
+
 ## [0.3.1] - 2018-09-13
 ### Added
 - get_fd() for channels

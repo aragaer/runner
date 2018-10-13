@@ -160,7 +160,7 @@ class RunnerTest(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(dirname))
         sockname = os.path.join(dirname, "socket")
 
-        cmd = 'sh -c "sleep 0.1; socat SYSTEM:cat UNIX-LISTEN:{}"'.format(sockname)
+        cmd = 'sh -c "sleep 0.01; socat SYSTEM:cat UNIX-LISTEN:{}"'.format(sockname)
         self._runner.update_config({"socat":
                                     {"command": cmd,
                                      "type": "socket",
@@ -209,7 +209,7 @@ class RunnerTest(unittest.TestCase):
         with self.assertRaises(KeyboardInterrupt):
             os.killpg(os.getpgrp(), signal.SIGINT)
 
-        time.sleep(0.1)
+        time.sleep(0.01)
 
         with self.assertRaises(EndpointClosedException):
             self._runner.get_channel('sleep_echo').write(b'\n')

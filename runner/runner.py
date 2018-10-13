@@ -42,7 +42,7 @@ class _App:
         sock = socket.socket(socket.AF_UNIX)
         _LOGGER.debug("Waiting for socket %s", sockname)
         while not os.path.exists(sockname):
-            time.sleep(0.1)
+            time.sleep(0.01)
         sock.connect(sockname)
         return channel.SocketChannel(sock)
 
