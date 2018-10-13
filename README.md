@@ -115,3 +115,32 @@ The following channel classes are implemented:
 - `SocketChannel` is returned when communicating with process over socket. Can be manually constructed for any socket (not limited to UNIX sockets).
 - `LineChannel` is returned when line buffering is enabled. Can be manually constructed for any other channel class.
 - `TestChannel` (in package runner.testing) provides `put` and `get` methods to to feed data to `read` and fetch "written" data respectively.
+
+### Poller
+Poller is a wrapper for `select.poll` that also supports accepting and
+keeping track of TCP/Unix clients.
+
+`register(self, channel)`
+
+Registers the channel for polling.
+
+`add_server(self, sock)`
+
+Registers a server socket. Poller will accept incoming connections and
+automatically register clients.
+
+`unregister(self, channel)`
+
+Removes a registered channel.
+
+`close_all(self)`
+
+Closes all registered channels and servers.
+
+`poll(self, timeout=None)`
+
+Performs a single call to `select.poll()`. `timeout` is the number of
+seconds for polling or `None` for infinite polling. Return value is a
+list of pairs in format of `(data, channel)` for channels and `((addr,
+client_channel), sock)` for server sockets. `addr` depends on socket
+type.
