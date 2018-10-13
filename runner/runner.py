@@ -83,7 +83,7 @@ class Runner:
         self._procs = {}
 
     def add(self, app, command, **kwargs):
-        self.update_config({app: {"command": command, **kwargs}})
+        self.update_config({app: dict(command=command, **kwargs)})
 
     def update_config(self, config):
         for app, app_config in config.items():
@@ -94,7 +94,8 @@ class Runner:
         if alias is None:
             alias = app_name
         if alias in self._procs:
-            _LOGGER.info("Application alias %s is already taken, not starting %s", alias, app_name)
+            _LOGGER.info("Application alias %s is already taken, not starting %s",
+                         alias, app_name)
             return
         _LOGGER.info("Starting application %s as %s", app_name, alias)
         self._procs[alias] = self._apps[app_name].start(with_args, **kwargs)

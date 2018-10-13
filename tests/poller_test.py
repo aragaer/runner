@@ -51,7 +51,7 @@ class PollerTest(unittest.TestCase):
     def _setup_server(self):
         serv = socket.socket()
         serv.bind(('127.0.0.1', 0))
-        serv.listen()
+        serv.listen(0)
         self.addCleanup(serv.close)
         return serv
 
@@ -86,9 +86,7 @@ class PollerTest(unittest.TestCase):
             chan.read()
 
     def test_close_all_servers(self):
-        serv = socket.socket()
-        serv.bind(('127.0.0.1', 0))
-        serv.listen()
+        serv = self._setup_server()
         self._poller.add_server(serv)
 
         self._poller.close_all()

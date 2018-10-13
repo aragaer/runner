@@ -19,7 +19,7 @@ class RunnerTest(unittest.TestCase):
 
     @staticmethod
     def _readline(channel):
-        for _ in range(100):
+        for _ in range(1000):
             time.sleep(0.001)
             line = channel.read()
             if line is not None:
@@ -203,7 +203,7 @@ class RunnerTest(unittest.TestCase):
         self.assertEqual(self._readline(chan), b'hello, world\n')
 
     def test_setpgrp_false(self):
-        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read; echo test"'}})
+        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read a; echo test"'}})
 
         self._runner.start("sleep_echo")
         with self.assertRaises(KeyboardInterrupt):
@@ -215,7 +215,7 @@ class RunnerTest(unittest.TestCase):
             self._runner.get_channel('sleep_echo').write(b'\n')
 
     def test_setpgrp_true(self):
-        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read; echo test"',
+        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read a; echo test"',
                                                    "setpgrp": True}})
 
         self._runner.start("sleep_echo")
