@@ -54,20 +54,6 @@ class PipeChannelTest(unittest.TestCase):
         self.assertEqual(faucet_file.readline(), b'')
         self.assertEqual(faucet_file.readline(), b'')
 
-    def test_write_list(self):
-        this_faucet_fd, that_sink_fd = os.pipe()
-        channel = PipeChannel(sink=that_sink_fd)
-
-        channel.write(b'hello, ', b'world\n')
-
-        faucet_file = os.fdopen(this_faucet_fd, mode='rb')
-        fl = fcntl.fcntl(this_faucet_fd, fcntl.F_GETFL)
-        fcntl.fcntl(this_faucet_fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-
-        self.assertEqual(faucet_file.readline(), b'hello, world\n')
-        self.assertEqual(faucet_file.readline(), b'')
-        self.assertEqual(faucet_file.readline(), b'')
-
     def test_closed_read(self):
         that_faucet_fd, _ = os.pipe()
         faucet = PipeChannel(that_faucet_fd)

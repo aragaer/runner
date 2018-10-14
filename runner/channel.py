@@ -1,5 +1,6 @@
 import fcntl
 import os
+import socket
 
 from abc import ABCMeta, abstractmethod
 
@@ -15,7 +16,7 @@ class Channel(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def write(self, *data): #pragma: no cover
+    def write(self, data): #pragma: no cover
         raise NotImplementedError
 
     @abstractmethod
@@ -37,7 +38,7 @@ class PipeChannel(Channel):
             fcntl.fcntl(faucet, fcntl.F_SETFL, fl | os.O_NONBLOCK)
             self._in = os.fdopen(faucet, mode='rb')
         if sink is not None:
-            self._out = os.fdopen(sink, mode='wb')
+            self._out = os.fdopen(sink, mode='wb', buffering=0)
 
     def read(self):
         try:
@@ -45,11 +46,9 @@ class PipeChannel(Channel):
         except (ValueError, OSError) as ex:
             raise EndpointClosedException(ex)
 
-    def write(self, *data):
+    def write(self, data):
         try:
-            for d in data:
-                self._out.write(d)
-            self._out.flush()
+            self._out.write(data)
         except (ValueError, OSError) as ex:
             raise EndpointClosedException(ex)
 
@@ -79,10 +78,9 @@ class SocketChannel(Channel):
         except OSError as ex:
             raise EndpointClosedException(ex)
 
-    def write(self, *data):
+    def write(self, data):
         try:
-            for d in data:
-                self._sock.send(d)
+            self._sock.send(data)
         except OSError as ex:
             raise EndpointClosedException(ex)
 
@@ -123,8 +121,8 @@ class LineChannel(Channel):
                 self._lf = lf + len(self._buffer)
             self._buffer += new_bytes
 
-    def write(self, *data):
-        return self._inner.write(*data)
+    def write(self, data):
+        return self._inner.write(data)
 
     def close(self):
         return self._inner.close()

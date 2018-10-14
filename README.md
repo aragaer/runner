@@ -94,10 +94,10 @@ implements the following methods:
 Performs a non-blocking read. Returns bytes available if any, `None`
 if no bytes are available, `b''` when channel is closed.
 
-`write(self, *data)`
+`write(self, data)`
 
-Writes chunks of bytes to the channel. Raises
-`EndpointClosedException` if channel is closed.
+Writes bytes to the channel. Raises `EndpointClosedException` if
+channel is closed.
 
 `close(self)`
 

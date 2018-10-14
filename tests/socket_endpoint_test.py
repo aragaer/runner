@@ -28,11 +28,6 @@ class SocketChannelTest(unittest.TestCase):
 
         self.assertEqual(self._server.recv(4096), b'hello, world')
 
-    def test_write_list(self):
-        self._channel.write(b'hello, ', b'world')
-
-        self.assertEqual(self._server.recv(4096), b'hello, world')
-
     def test_closed_read(self):
         self._client.close()
 
