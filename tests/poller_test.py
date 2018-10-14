@@ -82,7 +82,7 @@ class PollerTest(unittest.TestCase):
 
         self._poller.close_all()
 
-        with self.assertRaises(EndpointClosedException):
+        with self.assertRaises(ValueError):
             chan.read()
 
     def test_close_all_servers(self):

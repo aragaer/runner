@@ -96,8 +96,7 @@ if no bytes are available, `b''` when channel is closed.
 
 `write(self, data)`
 
-Writes bytes to the channel. Raises `EndpointClosedException` if
-channel is closed.
+Writes bytes to the channel.
 
 `close(self)`
 

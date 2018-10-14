@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Poller class
-- utils file with `timeout` context manager
+- Utils file with `timeout` context manager
 
 ### Changed
 - Runner now sleeps for 0.01 seconds when waiting for socket file
 - Channel.read() now returns None when there is no data, b'' if channel is closed
+- Channel.read() and Channel.write() may raise different exceptions
 
 ### Fixed
 - Fixed for Python 3.4

@@ -108,10 +108,10 @@ class RunnerTest(unittest.TestCase):
 
         self.assertIsNone(self._runner.get_channel('cat'))
 
-        with self.assertRaises(EndpointClosedException):
+        with self.assertRaises(ValueError):
             chan.read()
 
-        with self.assertRaises(EndpointClosedException):
+        with self.assertRaises(ValueError):
             chan.write(b' ')
 
     def test_terminate_socket(self):
@@ -203,31 +203,31 @@ class RunnerTest(unittest.TestCase):
         self.assertEqual(self._readline(chan), b'hello, world\n')
 
     def test_setpgrp_false(self):
-        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read a; echo test"'}})
+        self._runner.add("cat", 'cat')
 
-        self._runner.start("sleep_echo")
+        self._runner.start("cat")
+        chan = self._runner.get_channel('cat')
         with self.assertRaises(KeyboardInterrupt):
             os.killpg(os.getpgrp(), signal.SIGINT)
 
         time.sleep(0.01)
-
-        with self.assertRaises(EndpointClosedException):
-            self._runner.get_channel('sleep_echo').write(b'\n')
+        with self.assertRaises(BrokenPipeError):
+            chan.write(b'test\n')
 
     def test_setpgrp_true(self):
-        self._runner.update_config({"sleep_echo": {"command": 'sh -c "read a; echo test"',
-                                                   "setpgrp": True}})
-
-        self._runner.start("sleep_echo")
+        self._runner.add('cat', 'cat', setpgrp=True)
+        self._runner.start("cat")
+        chan = self._runner.get_channel('cat')
         with self.assertRaises(KeyboardInterrupt):
             os.killpg(os.getpgrp(), signal.SIGINT)
 
         if os.environ.get('TRAVIS', False):
             raise unittest.SkipTest("setpgrp doesn't work on travis")
 
-        chan = self._runner.get_channel('sleep_echo')
-        chan.write(b'\n')
-        self.assertEqual(self._readline(chan), b'test\n', "Child process is not killed")
+        time.sleep(0.01)
+        chan.write(b'test\n')
+        time.sleep(0.01)
+        self.assertEqual(chan.read(), b'test\n', "Child process is not killed")
 
     def test_register_cat(self):
         self._runner.add("cat", command="cat")

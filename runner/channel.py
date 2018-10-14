@@ -1,4 +1,5 @@
 import fcntl
+import io
 import os
 import socket
 
@@ -29,39 +30,37 @@ class Channel(metaclass=ABCMeta):
 
 class PipeChannel(Channel):
 
-    _in = None
-    _out = None
-
     def __init__(self, faucet=None, sink=None):
+        f_in, f_out = None, None
+        self._fileno = None
         if faucet is not None:
             fl = fcntl.fcntl(faucet, fcntl.F_GETFL)
             fcntl.fcntl(faucet, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-            self._in = os.fdopen(faucet, mode='rb')
+            f_in = os.fdopen(faucet, mode='rb')
+            self._fileno = faucet
         if sink is not None:
-            self._out = os.fdopen(sink, mode='wb', buffering=0)
+            f_out = os.fdopen(sink, mode='wb', buffering=0)
+
+        if f_in and f_out:
+            self._io = io.BufferedRWPair(f_in, f_out, 1)
+        elif f_in:
+            self._io = f_in
+        else:
+            self._io = f_out
 
     def read(self):
-        try:
-            return self._in.read()
-        except (ValueError, OSError) as ex:
-            raise EndpointClosedException(ex)
+        return self._io.read()
 
     def write(self, data):
-        try:
-            self._out.write(data)
-        except (ValueError, OSError) as ex:
-            raise EndpointClosedException(ex)
+        self._io.write(data)
 
     def close(self):
-        if self._in is not None:
-            self._in.close()
-        if self._out is not None:
-            self._out.close()
+        self._io.close()
 
     def get_fd(self):
-        if self._in is not None:
-            return self._in.fileno()
-        return super().get_fd()
+        if self._fileno is None:
+            return super().get_fd()
+        return self._fileno
 
 
 class SocketChannel(Channel):

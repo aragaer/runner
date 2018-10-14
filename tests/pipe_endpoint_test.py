@@ -60,7 +60,7 @@ class PipeChannelTest(unittest.TestCase):
 
         os.close(that_faucet_fd)
 
-        with self.assertRaises(EndpointClosedException):
+        with self.assertRaises(OSError):
             faucet.read()
 
     def test_close_read(self):
@@ -78,7 +78,7 @@ class PipeChannelTest(unittest.TestCase):
 
         os.close(that_sink_fd)
 
-        with self.assertRaises(EndpointClosedException):
+        with self.assertRaises(OSError):
             channel.write(b' ')
 
     def test_close(self):
