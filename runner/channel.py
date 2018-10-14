@@ -41,12 +41,7 @@ class PipeChannel(Channel):
 
     def read(self):
         try:
-            result = self._in.read()
-            if result is None:
-                return b''
-            if not result:
-                raise EndpointClosedException()
-            return result
+            return self._in.read()
         except (ValueError, OSError) as ex:
             raise EndpointClosedException(ex)
 
@@ -78,12 +73,9 @@ class SocketChannel(Channel):
 
     def read(self):
         try:
-            result = self._sock.recv(4096)
-            if not result:
-                raise EndpointClosedException()
-            return result
+            return self._sock.recv(4096)
         except BlockingIOError:
-            return b''
+            return None
         except OSError as ex:
             raise EndpointClosedException(ex)
 
@@ -108,37 +100,28 @@ class LineChannel(Channel):
         self._buffer = b''
         self._lf = 0
 
-    def _read(self):
-        new_bytes = self._inner.read()
-        self._lf = new_bytes.find(b'\n')+1
-        if self._lf:
-            self._lf += len(self._buffer)
-        self._buffer += new_bytes
-
     def _get_first_line(self):
         result, self._buffer = self._buffer[:self._lf], self._buffer[self._lf:]
         self._lf = self._buffer.find(b'\n')+1
         return result
 
     def read(self):
-        if self._lf:
-            return self._get_first_line()
+        for _ in range(2):
+            if self._lf:
+                return self._get_first_line()
 
-        try:
-            self._read()
-        except EndpointClosedException:
-            if not self._buffer:
-                raise
+            new_bytes = self._inner.read()
+            if new_bytes is None:
+                return
 
-        if self._lf:
-            return self._get_first_line()
+            if not new_bytes:
+                result, self._buffer = self._buffer, b''
+                return result
 
-        try:
-            self._read()
-        except EndpointClosedException:
-            result, self._buffer = self._buffer, b''
-            return result
-        return b''
+            lf = new_bytes.find(b'\n')+1
+            if lf:
+                self._lf = lf + len(self._buffer)
+            self._buffer += new_bytes
 
     def write(self, *data):
         return self._inner.write(*data)

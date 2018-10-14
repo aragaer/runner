@@ -32,7 +32,7 @@ class RunnerBufferingTest(unittest.TestCase):
     def test_read_partial(self):
         self._chan.write(b'te')
 
-        self.assertEqual(_readall(self._chan), b'')
+        self.assertEqual(_readall(self._chan), None)
 
         self._chan.write(b'st\nx')
 
@@ -67,9 +67,11 @@ class SimpleChannel(Channel):
     _closed = False
 
     def read(self):
-        if self._closed and not self._bytes:
-            raise EndpointClosedException
         result, self._bytes = self._bytes, b''
+        if not result:
+            if self._closed:
+                return b''
+            return None
         return result
 
     def write(self, *data):
@@ -95,17 +97,17 @@ class LineBufferingTest(unittest.TestCase):
     def test_write_partial(self):
         self._chan.write(b'te')
 
-        self.assertEqual(self._chan.read(), b'')
+        self.assertEqual(self._chan.read(), None)
 
     def test_write_two_step(self):
         self._chan.write(b'te')
 
-        self.assertEqual(self._chan.read(), b'')
+        self.assertEqual(self._chan.read(), None)
 
         self._chan.write(b'st\n')
 
         self.assertEqual(self._chan.read(), b'test\n')
-        self.assertEqual(self._chan.read(), b'')
+        self.assertEqual(self._chan.read(), None)
 
     def test_write_more_than_one_line(self):
         self._chan.write(b'a\nb\n')
@@ -127,8 +129,7 @@ class LineBufferingTest(unittest.TestCase):
 
         self.assertEqual(self._chan.read(), b'hello\n')
         self.assertEqual(self._chan.read(), b'world')
-        with self.assertRaises(EndpointClosedException):
-            print(self._chan.read())
+        self.assertEqual(self._chan.read(), b'')
 
     def test_get_fd_not_implemented(self):
         with self.assertRaises(NotImplementedError):

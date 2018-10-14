@@ -13,7 +13,7 @@ class TestChannelTest(unittest.TestCase):
         self._chan.close()
 
     def test_read_empty(self):
-        self.assertEqual(self._chan.read(), b'')
+        self.assertEqual(self._chan.read(), None)
 
     def test_read(self):
         self._chan.put(b'Hello')
@@ -21,7 +21,7 @@ class TestChannelTest(unittest.TestCase):
         self.assertEqual(self._chan.read(), b'Hello')
 
     def test_get(self):
-        self.assertEqual(self._chan.get(), b'')
+        self.assertEqual(self._chan.get(), None)
 
     def test_write(self):
         self._chan.write(b'hi')

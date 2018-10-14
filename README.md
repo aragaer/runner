@@ -91,13 +91,13 @@ implements the following methods:
 
 `read(self)`
 
-Performs a non-blocking read and returns any bytes available. Raises
-`EndpointClosedException` if the process on the other side of the
-channel is terminated.
+Performs a non-blocking read. Returns bytes available if any, `None`
+if no bytes are available, `b''` when channel is closed.
 
 `write(self, *data)`
 
-Writes chunks of bytes to the channel. Raises `EndpointClosedException`.
+Writes chunks of bytes to the channel. Raises
+`EndpointClosedException` if channel is closed.
 
 `close(self)`
 

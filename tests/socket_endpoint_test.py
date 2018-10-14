@@ -20,8 +20,8 @@ class SocketChannelTest(unittest.TestCase):
         self._server.send(b'hello, world')
 
         self.assertEqual(self._channel.read(), b'hello, world')
-        self.assertEqual(self._channel.read(), b'')
-        self.assertEqual(self._channel.read(), b'')
+        self.assertEqual(self._channel.read(), None)
+        self.assertEqual(self._channel.read(), None)
 
     def test_write(self):
         self._channel.write(b'hello, world')
@@ -64,8 +64,7 @@ class SocketChannelTest(unittest.TestCase):
         self._server.close()
 
         self.assertEqual(self._channel.read(), b'hello, world')
-        with self.assertRaises(EndpointClosedException):
-            self._channel.read()
+        self.assertEqual(self._channel.read(), b'')
 
     def test_get_fd(self):
         self.assertEqual(self._channel.get_fd(), self._client.fileno())

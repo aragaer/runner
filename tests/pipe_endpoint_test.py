@@ -16,8 +16,8 @@ class PipeChannelTest(unittest.TestCase):
         sink_file.flush()
 
         self.assertEqual(channel.read(), b'hello, world')
-        self.assertEqual(channel.read(), b'')
-        self.assertEqual(channel.read(), b'')
+        self.assertEqual(channel.read(), None)
+        self.assertEqual(channel.read(), None)
 
     def test_write(self):
         this_faucet_fd, that_sink_fd = os.pipe()
@@ -48,8 +48,8 @@ class PipeChannelTest(unittest.TestCase):
         channel.write(b'hello, world\n')
 
         self.assertEqual(channel.read(), b'hello, world')
-        self.assertEqual(channel.read(), b'')
-        self.assertEqual(channel.read(), b'')
+        self.assertEqual(channel.read(), None)
+        self.assertEqual(channel.read(), None)
         self.assertEqual(faucet_file.readline(), b'hello, world\n')
         self.assertEqual(faucet_file.readline(), b'')
         self.assertEqual(faucet_file.readline(), b'')
@@ -114,8 +114,7 @@ class PipeChannelTest(unittest.TestCase):
         sink_file.close()
 
         self.assertEqual(channel.read(), b'hello, world')
-        with self.assertRaises(EndpointClosedException):
-            channel.read()
+        self.assertEqual(channel.read(), b'')
 
     def test_get_fd_read(self):
         that_faucet_fd, this_sink_fd = os.pipe()

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Runner now sleeps for 0.01 seconds when waiting for socket file
+- Channels now return None when there is no data, b'' if channel is closed
 
 ### Fixed
 - Fixed for Python 3.4
