@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="yet-another-runner",
-    version="0.3.1",
+    version="0.4.0",
     author="Ilya Konovalov",
     author_email="aragaer@gmail.com",
     description="Simple process runner",
