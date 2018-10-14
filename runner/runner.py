@@ -5,7 +5,7 @@ import socket
 import subprocess
 import time
 
-import runner.channel as channel
+import channels
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class _App:
         while not os.path.exists(sockname):
             time.sleep(0.01)
         sock.connect(sockname)
-        return channel.SocketChannel(sock)
+        return channels.SocketChannel(sock)
 
     def start(self, extra_args, **extra_kwargs):
         kwargs = dict(self._kwargs, **extra_kwargs)
@@ -67,12 +67,12 @@ class _App:
                                 preexec_fn=preexec_fn,
                                 cwd=self._kwargs.get('cwd'))
         if self._type == 'stdio':
-            chan = channel.PipeChannel(sink=proc.stdin.fileno(),
+            chan = channels.PipeChannel(sink=proc.stdin.fileno(),
                                        faucet=proc.stdout.fileno())
         elif self._type == 'socket':
             chan = self._connect_socket(sockname)
         if kwargs.get("buffering") == "line":
-            chan = channel.LineChannel(chan)
+            chan = channels.LineChannel(chan)
         return _Proc(proc, chan)
 
 

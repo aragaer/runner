@@ -5,9 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
-- Poller class
-- utils file with `timeout` context manager
+### Removed
+- Channel-related code is moved to a separate package yet-another-io-channels-library
 
 ### Changed
 - Runner now sleeps for 0.01 seconds when waiting for socket file

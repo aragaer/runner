@@ -7,17 +7,17 @@ have some predetermined parameters and additional parameters or
 overrides can be passed when application is executed. Multiple
 instances of one application can be running using aliases.
 
-To communicate to running processes Channel classes are used. These
-provide non-blocking byte- or line-oriented data. Currently STDIO and
-UNIX socket are supported.
+To communicate to running processes Channel classes from
+[yet-another-io-channels-library](https://github.com/aragaer/channels)
+are used.
 
 Examples:
 
 Using STDIO.
 
     runner = Runner()
-    runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
-    runner.ensure_running('cat')
+    runner.add("cat", "cat")
+    runner.start('cat')
     channel = runner.get_channel('cat')
     channel.write(b'hello, world')
 	# later
@@ -26,11 +26,9 @@ Using STDIO.
 Using UNIX socket.
 
     runner = Runner()
-    self._runner.update_config({"socat":
-                                {"command": "socat SYSTEM:cat UNIX-LISTEN:socket",
-                                 "type": "socket",
-                                 "socket": "socket"}})
-    runner.ensure_running('socat')
+    self._runner.add("socat", "socat SYSTEM:cat UNIX-LISTEN:socket",
+	                 type="socket", socket="socket")
+    runner.start('socat')
     channel = runner.get_channel('socat')
     channel.write(b'hello, world')
 	# later
@@ -84,63 +82,3 @@ Returns the `Channel` object to communicate to the running process.
 `terminate(self, alias)`
 
 Terminates the process.
-
-### Channel
-Channel is the base class for different channels. Every channel
-implements the following methods:
-
-`read(self)`
-
-Performs a non-blocking read and returns any bytes available. Raises
-`EndpointClosedException` if the process on the other side of the
-channel is terminated.
-
-`write(self, *data)`
-
-Writes chunks of bytes to the channel. Raises `EndpointClosedException`.
-
-`close(self)`
-
-Closes the channel and frees up the resources.
-
-`get_fd(self)`
-
-Returns a file descriptor number that can be used for `poll` or
-`epoll` for reading. Raises `NotImplementedError` if (custom) channel
-doesn't support reading.
-
-The following channel classes are implemented:
-
-- `PipeChannel` is returned when communicating with process over STDIO. Can be manually constructed to wrap reading and/or writing to any file descriptor.
-- `SocketChannel` is returned when communicating with process over socket. Can be manually constructed for any socket (not limited to UNIX sockets).
-- `LineChannel` is returned when line buffering is enabled. Can be manually constructed for any other channel class.
-- `TestChannel` (in package runner.testing) provides `put` and `get` methods to to feed data to `read` and fetch "written" data respectively.
-
-### Poller
-Poller is a wrapper for `select.poll` that also supports accepting and
-keeping track of TCP/Unix clients.
-
-`register(self, channel)`
-
-Registers the channel for polling.
-
-`add_server(self, sock)`
-
-Registers a server socket. Poller will accept incoming connections and
-automatically register clients.
-
-`unregister(self, channel)`
-
-Removes a registered channel.
-
-`close_all(self)`
-
-Closes all registered channels and servers.
-
-`poll(self, timeout=None)`
-
-Performs a single call to `select.poll()`. `timeout` is the number of
-seconds for polling or `None` for infinite polling. Return value is a
-list of pairs in format of `(data, channel)` for channels and `((addr,
-client_channel), sock)` for server sockets. `addr` depends on socket
-type.

@@ -6,7 +6,8 @@ import unittest
 
 from tempfile import mkdtemp
 
-from runner.channel import EndpointClosedException, Channel
+from channels import EndpointClosedException, Channel
+
 from runner import Runner, ProcessExistsException
 
 

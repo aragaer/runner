@@ -1,1 +1,3 @@
 nose
+yet-another-io-channels-library==0.1.1
+

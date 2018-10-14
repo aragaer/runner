@@ -17,6 +17,7 @@ setup(
     keywords="run command shell socket",
     url="https://github.com/aragaer/runner",
     packages=["runner"],
+    install_requires=["yet-another-io-channels-library==0.1.1"],
     classifiers=[
         "Topic :: Utilities",
         "Development Status :: 3 - Alpha",
