@@ -249,3 +249,20 @@ class RunnerTest(unittest.TestCase):
         channel.write(b'hello, world')
 
         self.assertEquals(self._readline(channel), b'hello, world')
+
+    def test_extra_kwargs_override_cwd(self):
+        dirname = mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(dirname))
+        with open(os.path.join(dirname, "file"), "w") as file:
+            file.write('{"message": "test"}\n')
+
+        self._runner.update_config({"cat":
+                                    {"command": "cat file",
+                                     "type": "stdio",
+                                     "cwd": 'xxx'}})
+
+        self._runner.ensure_running('cat', cwd=dirname)
+
+        channel = self._runner.get_channel('cat')
+        self.assertTrue(isinstance(channel, Channel))
+        self.assertEquals(self._readline(channel), b'{"message": "test"}\n')

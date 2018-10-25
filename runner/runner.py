@@ -1,79 +1,12 @@
 import logging
-import os
-import shlex
-import socket
-import subprocess
-import time
 
-import channels
+from .proc import App
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class ProcessExistsException(Exception):
     pass
-
-
-class _Proc:
-
-    def __init__(self, proc, chan):
-        self._proc = proc
-        self._channel = chan
-
-    @property
-    def channel(self):
-        return self._channel
-
-    def terminate(self):
-        self._channel.close()
-        self._proc.terminate()
-        self._proc.wait()
-
-
-class _App:
-
-    def __init__(self, command, type="stdio", **kwargs):
-        self._command = shlex.split(command)
-        self._type = type
-        self._kwargs = kwargs
-
-    @staticmethod
-    def _connect_socket(sockname, buffering):
-        sock = socket.socket(socket.AF_UNIX)
-        _LOGGER.debug("Waiting for socket %s", sockname)
-        while not os.path.exists(sockname):
-            time.sleep(0.01)
-        sock.connect(sockname)
-        return channels.SocketChannel(sock,
-                                      buffering=buffering)
-
-    def start(self, extra_args, **extra_kwargs):
-        kwargs = dict(self._kwargs, **extra_kwargs)
-        if self._type == 'stdio':
-            stdin = stdout = subprocess.PIPE
-        elif self._type == 'socket':
-            sockname = kwargs['socket']
-            stdin = stdout = None
-            if os.path.exists(sockname):
-                os.unlink(sockname)
-        command = self._command[:]
-        if extra_args is not None:
-            command += extra_args
-        preexec_fn = None
-        if kwargs.get('setpgrp', False):
-            preexec_fn = os.setpgrp
-        proc = subprocess.Popen(command,
-                                stdin=stdin,
-                                stdout=stdout,
-                                preexec_fn=preexec_fn,
-                                cwd=self._kwargs.get('cwd'))
-        if self._type == 'stdio':
-            chan = channels.PipeChannel(sink=proc.stdin.fileno(),
-                                        faucet=proc.stdout.fileno(),
-                                        buffering=kwargs.get('buffering'))
-        elif self._type == 'socket':
-            chan = self._connect_socket(sockname, kwargs.get('buffering'))
-        return _Proc(proc, chan)
 
 
 class Runner:
@@ -88,7 +21,7 @@ class Runner:
     def update_config(self, config):
         for app, app_config in config.items():
             _LOGGER.debug("Updating config for %s", app)
-            self._apps[app] = _App(**app_config)
+            self._apps[app] = App(**app_config)
 
     def ensure_running(self, app_name, alias=None, with_args=None, **kwargs):
         if alias is None:
@@ -97,8 +30,10 @@ class Runner:
             _LOGGER.info("Application alias %s is already taken, not starting %s",
                          alias, app_name)
             return
+        if with_args is None:
+            with_args = []
         _LOGGER.info("Starting application %s as %s", app_name, alias)
-        self._procs[alias] = self._apps[app_name].start(with_args, **kwargs)
+        self._procs[alias] = self._apps[app_name].start(*with_args, **kwargs)
         _LOGGER.debug("%s started", alias)
 
     def start(self, app_name, alias=None, with_args=None, **kwargs):
