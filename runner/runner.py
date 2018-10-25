@@ -38,13 +38,14 @@ class _App:
         self._kwargs = kwargs
 
     @staticmethod
-    def _connect_socket(sockname):
+    def _connect_socket(sockname, buffering):
         sock = socket.socket(socket.AF_UNIX)
         _LOGGER.debug("Waiting for socket %s", sockname)
         while not os.path.exists(sockname):
             time.sleep(0.01)
         sock.connect(sockname)
-        return channels.SocketChannel(sock)
+        return channels.SocketChannel(sock,
+                                      buffering=buffering)
 
     def start(self, extra_args, **extra_kwargs):
         kwargs = dict(self._kwargs, **extra_kwargs)
@@ -68,11 +69,10 @@ class _App:
                                 cwd=self._kwargs.get('cwd'))
         if self._type == 'stdio':
             chan = channels.PipeChannel(sink=proc.stdin.fileno(),
-                                       faucet=proc.stdout.fileno())
+                                        faucet=proc.stdout.fileno(),
+                                        buffering=kwargs.get('buffering'))
         elif self._type == 'socket':
-            chan = self._connect_socket(sockname)
-        if kwargs.get("buffering") == "line":
-            chan = channels.LineChannel(chan)
+            chan = self._connect_socket(sockname, kwargs.get('buffering'))
         return _Proc(proc, chan)
 
 
