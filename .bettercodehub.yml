@@ -1,0 +1,9 @@
+component_depth: 1
+languages:
+  - name: python
+    production:
+      exclude:
+        - /tests/.*\.py
+    test:
+      include:
+        - /tests/.*\.py
