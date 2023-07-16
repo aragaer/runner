@@ -1,14 +1,24 @@
 import os
 import shutil
 import signal
+import stat
 import time
 import unittest
 
-from tempfile import mkdtemp
+from pathlib import Path
+from tempfile import mkdtemp, mkstemp
 
 from channels import EndpointClosedException, Channel
 
 from runner import Runner, ProcessExistsException
+
+
+def readline(channel):
+    for _ in range(1000):
+        time.sleep(0.001)
+        line = channel.read()
+        if line is not None:
+            return line
 
 
 class RunnerTest(unittest.TestCase):
@@ -17,14 +27,6 @@ class RunnerTest(unittest.TestCase):
 
     def setUp(self):
         self._runner = Runner()
-
-    @staticmethod
-    def _readline(channel):
-        for _ in range(1000):
-            time.sleep(0.001)
-            line = channel.read()
-            if line is not None:
-                return line
 
     def test_cat(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
@@ -35,7 +37,7 @@ class RunnerTest(unittest.TestCase):
         self.assertTrue(isinstance(channel, Channel))
         channel.write(b'hello, world')
 
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_cat_socat(self):
         dirname = mkdtemp()
@@ -51,7 +53,7 @@ class RunnerTest(unittest.TestCase):
 
         channel = self._runner.get_channel('socat')
         channel.write(b'hello, world')
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_cwd(self):
         dirname = mkdtemp()
@@ -68,7 +70,7 @@ class RunnerTest(unittest.TestCase):
 
         channel = self._runner.get_channel('cat')
         self.assertTrue(isinstance(channel, Channel))
-        self.assertEquals(self._readline(channel), b'{"message": "test"}\n')
+        self.assertEquals(readline(channel), b'{"message": "test"}\n')
 
     def test_alias(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
@@ -77,7 +79,7 @@ class RunnerTest(unittest.TestCase):
         channel = self._runner.get_channel('cat0')
 
         channel.write(b'hello, world')
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_extra_args(self):
         dirname = mkdtemp()
@@ -96,9 +98,9 @@ class RunnerTest(unittest.TestCase):
         self._runner.ensure_running('cat', alias="cat2", with_args=['file2'])
 
         channel1 = self._runner.get_channel('cat1')
-        self.assertEquals(self._readline(channel1), b'{"message": "test1"}\n')
+        self.assertEquals(readline(channel1), b'{"message": "test1"}\n')
         channel2 = self._runner.get_channel('cat2')
-        self.assertEquals(self._readline(channel2), b'{"message": "test2"}\n')
+        self.assertEquals(readline(channel2), b'{"message": "test2"}\n')
 
     def test_terminate(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
@@ -154,7 +156,7 @@ class RunnerTest(unittest.TestCase):
 
         channel = self._runner.get_channel('socat')
         channel.write(b'hello, world')
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_wait_socket(self):
         dirname = mkdtemp()
@@ -171,7 +173,7 @@ class RunnerTest(unittest.TestCase):
 
         channel = self._runner.get_channel('socat')
         channel.write(b'hello, world')
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_terminate_restart(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio"}})
@@ -183,7 +185,7 @@ class RunnerTest(unittest.TestCase):
 
         chan = self._runner.get_channel('cat')
         chan.write(b'hello')
-        self.assertEqual(self._readline(chan), b'hello')
+        self.assertEqual(readline(chan), b'hello')
 
     def test_start(self):
         self._runner.update_config({"sleep": {"command": "sleep 5", "type": "stdio"}})
@@ -201,7 +203,7 @@ class RunnerTest(unittest.TestCase):
         self._runner.ensure_running("echo", with_args=["goodbye, world"])
 
         chan = self._runner.get_channel('echo')
-        self.assertEqual(self._readline(chan), b'hello, world\n')
+        self.assertEqual(readline(chan), b'hello, world\n')
 
     def test_setpgrp_false(self):
         self._runner.update_config({"sleep_echo": {"command": 'sh -c "read a; echo test"'}})
@@ -228,7 +230,7 @@ class RunnerTest(unittest.TestCase):
 
         chan = self._runner.get_channel('sleep_echo')
         chan.write(b'\n')
-        self.assertEqual(self._readline(chan), b'test\n', "Child process is not killed")
+        self.assertEqual(readline(chan), b'test\n', "Child process is not killed")
 
     def test_register_cat(self):
         self._runner.add("cat", command="cat")
@@ -237,7 +239,7 @@ class RunnerTest(unittest.TestCase):
         channel = self._runner.get_channel('cat')
         channel.write(b'hello, world')
 
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_extra_kwargs_override_kwargs(self):
         self._runner.update_config({"cat": {"command": "cat", "type": "stdio", "buffering": "line"}})
@@ -248,7 +250,7 @@ class RunnerTest(unittest.TestCase):
         self.assertTrue(isinstance(channel, Channel))
         channel.write(b'hello, world')
 
-        self.assertEquals(self._readline(channel), b'hello, world')
+        self.assertEquals(readline(channel), b'hello, world')
 
     def test_extra_kwargs_override_cwd(self):
         dirname = mkdtemp()
@@ -265,4 +267,30 @@ class RunnerTest(unittest.TestCase):
 
         channel = self._runner.get_channel('cat')
         self.assertTrue(isinstance(channel, Channel))
-        self.assertEquals(self._readline(channel), b'{"message": "test"}\n')
+        self.assertEquals(readline(channel), b'{"message": "test"}\n')
+
+
+class RunnerConstructorTest(unittest.TestCase):
+
+    def test_path(self):
+        dirname = mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(dirname))
+        scrfd, scrpath = mkstemp(dir=dirname)
+        with os.fdopen(scrfd, "w") as scr:
+            scr.write("#!/bin/sh\necho hello, world\n")
+        script = Path(scrpath)
+        script.chmod(stat.S_IRUSR | stat.S_IXUSR)
+
+        other_script = Path(dirname) / "script"
+        other_script.write_text(f"#!/bin/sh\n{script.name}\n")
+        other_script.chmod(stat.S_IRUSR | stat.S_IXUSR)
+
+        runner = Runner(extra_paths=[dirname])
+
+        runner.add("script", str(other_script), buffering='line')
+        runner.ensure_running('script')
+
+        channel = runner.get_channel('script')
+        line = readline(channel)
+        print(line.decode())
+        self.assertEquals(line, b'hello, world\n')

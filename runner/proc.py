@@ -44,13 +44,20 @@ class _ProcStarter:
     def get_channel(self): #pragma: no cover
         pass
 
-    def start(self):
+    def start(self, paths=None):
         self.pre_start()
+        if paths is None:
+            env = os.environ
+        else:
+            env = {k:v for k,v in os.environ.items()}
+            env["PATH"] = ':'.join(paths)
+            _LOGGER.debug("PATH set to %s", env["PATH"])
         self.proc = subprocess.Popen(self.command,
                                      stdin=self.stdin,
                                      stdout=self.stdout,
                                      preexec_fn=self.preexec_fn,
-                                     cwd=self.cwd)
+                                     cwd=self.cwd,
+                                     env=env)
 
         return _Proc(self.proc, self.get_channel())
 
@@ -110,4 +117,4 @@ class App:
             ps.preexec_fn = os.setpgrp
         if self._ps_class == _SocketProcStarter:
             ps.sockname = kwargs['socket']
-        return ps.start()
+        return ps.start(paths=kwargs.get('paths'))

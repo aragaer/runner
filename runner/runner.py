@@ -1,5 +1,7 @@
 import logging
 
+from os import environ
+
 from .proc import App
 
 _LOGGER = logging.getLogger(__name__)
@@ -11,9 +13,12 @@ class ProcessExistsException(Exception):
 
 class Runner:
 
-    def __init__(self):
+    def __init__(self, *, extra_paths=None):
         self._apps = {}
         self._procs = {}
+        self._paths = environ.get("PATH","").split(':')
+        if extra_paths is not None:
+            self._paths.extend(extra_paths)
 
     def add(self, app, command, **kwargs):
         self.update_config({app: dict(command=command, **kwargs)})
@@ -33,7 +38,9 @@ class Runner:
         if with_args is None:
             with_args = []
         _LOGGER.info("Starting application %s as %s", app_name, alias)
-        self._procs[alias] = self._apps[app_name].start(*with_args, **kwargs)
+        self._procs[alias] = self._apps[app_name].start(*with_args,
+                                                        paths=self._paths,
+                                                        **kwargs)
         _LOGGER.debug("%s started", alias)
 
     def start(self, app_name, alias=None, with_args=None, **kwargs):

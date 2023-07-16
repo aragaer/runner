@@ -38,6 +38,12 @@ Using UNIX socket.
 
 ### Runner
 
+`Runner(*, extra_paths=None)`
+
+Create a new runner object.
+
+- `extra_paths`: List of paths which will be appended to PATH environment variable
+
 `add(self, name, command, **kwargs)`
 
 Add the application to the list of registered applications or update
