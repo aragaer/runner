@@ -37,11 +37,11 @@ class _ProcStarter:
     stdout = None
 
     @abstractmethod
-    def pre_start(self): #pragma: no cover
+    def pre_start(self):  # pragma: no cover
         pass
 
     @abstractmethod
-    def get_channel(self): #pragma: no cover
+    def get_channel(self):  # pragma: no cover
         pass
 
     def start(self, paths=None):
@@ -49,7 +49,7 @@ class _ProcStarter:
         if paths is None:
             env = os.environ
         else:
-            env = {k:v for k,v in os.environ.items()}
+            env = {k: v for k, v in os.environ.items()}
             env["PATH"] = ':'.join(paths)
             _LOGGER.debug("PATH set to %s", env["PATH"])
         self.proc = subprocess.Popen(self.command,

@@ -291,6 +291,4 @@ class RunnerConstructorTest(unittest.TestCase):
         runner.ensure_running('script')
 
         channel = runner.get_channel('script')
-        line = readline(channel)
-        print(line.decode())
-        self.assertEquals(line, b'hello, world\n')
+        self.assertEquals(readline(channel), b'hello, world\n')

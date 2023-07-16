@@ -16,7 +16,7 @@ class Runner:
     def __init__(self, *, extra_paths=None):
         self._apps = {}
         self._procs = {}
-        self._paths = environ.get("PATH","").split(':')
+        self._paths = environ.get("PATH", "").split(':')
         if extra_paths is not None:
             self._paths.extend(extra_paths)
 
@@ -32,7 +32,7 @@ class Runner:
         if alias is None:
             alias = app_name
         if alias in self._procs:
-            _LOGGER.info("Application alias %s is already taken, not starting %s",
+            _LOGGER.info("Alias %s is already taken, not starting %s",
                          alias, app_name)
             return
         if with_args is None:

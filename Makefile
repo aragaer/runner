@@ -1,7 +1,7 @@
-.PHONY: test pypi-test pypi dist
+.PHONY: test pypi-test pypi dist flake
 
 test:
-	nose2
+	@nose2
 
 dist:
 	rm -rf dist
@@ -12,3 +12,6 @@ test-pypi: dist
 
 pypi:
 	twine upload dist/*
+
+flake:
+	@flake8
