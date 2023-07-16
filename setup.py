@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="yet-another-runner",
-    version="0.5.0",
+    version="0.6.0",
     author="Ilya Konovalov",
     author_email="aragaer@gmail.com",
     description="Simple process runner",
@@ -17,13 +17,13 @@ setup(
     keywords="run command shell socket",
     url="https://github.com/aragaer/runner",
     packages=["runner"],
-    install_requires=["attrs", "yet-another-io-channels-library>=0.2.0"],
+    install_requires=["yet-another-io-channels-library>=0.2.0"],
     classifiers=[
         "Topic :: Utilities",
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ]
 )
