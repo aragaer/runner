@@ -5,19 +5,20 @@ import socket
 import subprocess
 import time
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+from dataclasses import dataclass
+from typing import Callable, Optional
 
-import attr
 import channels
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@attr.s(frozen=True)
+@dataclass(frozen=True)
 class _Proc:
-    proc = attr.ib()
-    channel = attr.ib()
+    proc: subprocess.Popen
+    channel: channels.Channel
 
     def terminate(self):
         self.channel.close()
@@ -25,15 +26,15 @@ class _Proc:
         self.proc.wait()
 
 
-@attr.s
-class _ProcStarter(metaclass=ABCMeta):
-    command = attr.ib()
-    buffering = attr.ib()
-    cwd = attr.ib()
-    preexec_fn = attr.ib(init=False, default=None)
-    proc = attr.ib(init=False)
-    stdin = attr.ib(init=False)
-    stdout = attr.ib(init=False)
+@dataclass
+class _ProcStarter:
+    command: [str]
+    buffering: str = ""
+    cwd: str = None
+    preexec_fn: Optional[Callable] = None
+    proc: _Proc = None
+    stdin = None
+    stdout = None
 
     @abstractmethod
     def pre_start(self): #pragma: no cover
@@ -54,10 +55,10 @@ class _ProcStarter(metaclass=ABCMeta):
         return _Proc(self.proc, self.get_channel())
 
 
-@attr.s
+@dataclass
 class _PipeProcStarter(_ProcStarter):
 
-    def __attrs_post_init__(self):
+    def __post_init__(self):
         self.stdin = self.stdout = subprocess.PIPE
 
     def get_channel(self):
@@ -69,11 +70,11 @@ class _PipeProcStarter(_ProcStarter):
         pass
 
 
-@attr.s
+@dataclass
 class _SocketProcStarter(_ProcStarter):
-    sockname = attr.ib(init=False)
+    sockname: str = ""
 
-    def __attrs_post_init__(self):
+    def __post_init__(self):
         self.stdin = self.stdout = None
 
     def get_channel(self):

@@ -1,7 +1,7 @@
 .PHONY: test pypi-test pypi dist
 
 test:
-	nosetests
+	nose2
 
 dist:
 	rm -rf dist
